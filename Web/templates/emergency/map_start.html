@@ -1,0 +1,114 @@
+{% extends 'emergency/dashboard.html' %}
+{% block title %}Weather Prediction{% endblock %}
+{% block body %}
+
+<body class="flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-7xl h-full p-4">
+        <div class="flex w-full h-full rounded-lg shadow-lg overflow-hidden">
+            <!-- Map Container -->
+            <div class="w-4/5 p-4">
+                <div id="map" class="h-[600px] w-full rounded-lg overflow-hidden shadow-lg"></div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="w-1/5 p-3 flex flex-col justify-center rounded-lg shadow-lg businessdiv">
+                <form method="POST" action="/get_predicttt" class="space-y-6">
+                    <div>
+                        <label class="label">
+                            <span class="label-text text-lg">Latitude</span>
+                        </label>
+                        <input type="text" name="lat" id="lat" required class="input rounded-lg input-bordered w-full p-3 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                        <label class="label">
+                            <span class="label-text text-lg">Longitude</span>
+                        </label>
+                        <input type="text" name="lon" id="lon" required class="input input-bordered rounded-lg w-full p-3 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <button type="submit" class="btn bg-blue-500 text-white hover:bg-blue-700 w-full rounded-lg text-lg py-3">Predict</button>
+                </form>
+                <div class="mt-6">
+                    <input type="text" id="ps" class="input input-bordered w-full rounded-lg mb-3 p-3 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Search place" />
+                    <button type="button" onclick="searchPlace()" class="btn btn-neutral text-white rounded-lg w-full text-lg py-3">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        let map;
+
+        function initMap(latitude, longitude) {
+            const myLatLng = { lat: latitude, lng: longitude };
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: myLatLng,
+                zoom: 14,
+                disableDoubleClickZoom: true,
+            });
+
+            // Add event listener for map click to update latitude and longitude
+            google.maps.event.addListener(map, 'click', function (event) {
+                document.getElementById('lat').value = event.latLng.lat();
+                document.getElementById('lon').value = event.latLng.lng();
+            });
+
+            // Add a marker at the specified location
+            new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: `${latitude}, ${longitude}`
+            });
+
+            // Add event listener for map double-click to add a new marker
+            google.maps.event.addListener(map, 'dblclick', function (event) {
+                new google.maps.Marker({
+                    position: event.latLng,
+                    map: map,
+                    title: `${event.latLng.lat()}, ${event.latLng.lng()}`
+                });
+            });
+        }
+
+        // Function to search for a place and update the map
+        function searchPlace() {
+            const placeQuery = document.getElementById('ps').value;
+            if (placeQuery) {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${placeQuery}`;
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const place = data[0];
+                            const lat = parseFloat(place.lat);
+                            const lon = parseFloat(place.lon);
+                            updateMap(lat, lon);
+                        } else {
+                            alert('Place not found.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        }
+
+        // Function to update the map with new coordinates
+        function updateMap(latitude, longitude) {
+            initMap(latitude, longitude);
+            document.getElementById('lat').value = latitude;
+            document.getElementById('lon').value = longitude;
+        }
+
+        // Initialize the map with default coordinates when the window loads
+        window.onload = function() {
+            const defaultLatitude = 11.344895078472197;
+            const defaultLongitude = 75.92013925825333;
+            updateMap(defaultLatitude, defaultLongitude);
+        };
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3y0szjZmNj_w2q9Vnc08ZL_FU6Z4VTFE&callback=initMap"></script>
+
+</body>
+
+{% endblock %}

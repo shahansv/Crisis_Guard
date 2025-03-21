@@ -1,0 +1,70 @@
+{% extends 'coordinator/dashboard.html' %}
+{% block title %}Notification{% endblock %}
+{% block body %}
+<div class="container mx-auto p-4">
+    <div class="flex flex-col items-center mb-4">
+        <h1 class="text-3xl font-bold mb-10">Notification</h1>
+        <form id="notificationSearch" action="/coordinator_search_notification/" method="POST" class="flex items-center w-full max-w-md">
+            <input type="date" name="date" placeholder="Select Date"
+                class="input input-bordered w-full mr-2 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" />
+            <button type="submit" class="btn btn-neutral rounded-lg">Search</button>
+        </form>
+    </div>
+
+    <div class="overflow-x-auto w-full">
+        <table class="table w-full">
+            <!-- head -->
+            <thead>
+                <tr class="bg-base-200">
+                    <th class="text-center w-1/2">Notification</th>
+                    <th class="text-center w-1/4">Date</th>
+                    <th class="text-center w-1/4">Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- row 1 -->
+                {% if val %}
+                {% for i in val %}
+                <tr class="hover">
+                    <td class="text-center w-1/2 ">
+                        <div class="flex flex-col items-center gap-3">
+                            <div>
+                                <div class="font-bold">{{ i.title }}</div>
+                                <div class="text-sm opacity-50"> {{ i.notification }} </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-center w-1/4">{{ i.posted_date }}</td>
+                    <td class="text-center w-1/4">{{ i.posted_time }}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="3" class="text-center py-4">
+                        <div class="bg-yellow-100 text-yellow-700 border border-yellow-300 p-4 rounded-lg flex items-center justify-center w-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6 mr-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>No Notification found.</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('notificationSearch').addEventListener('submit', function(event) {
+            var dateInput = document.querySelector('input[name="date"]');
+            if (dateInput.value.trim() === "") {
+                event.preventDefault();
+                window.location.href = "/coordinator_view_notification/";
+            }
+        });
+    });
+</script>
+
+{% endblock %}

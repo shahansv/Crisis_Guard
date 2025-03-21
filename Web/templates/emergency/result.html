@@ -1,0 +1,367 @@
+{% extends 'emergency/dashboard.html' %}
+{% block title %}Prediction Result{% endblock %}
+{% block body %}
+
+<!-- Include Lottie Library -->
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+<div class="max-w-4xl mx-auto mt-10 p-6 bg-base-100 shadow-lg rounded-xl">
+    <div class="text-3xl font-bold mb-6 text-center">Prediction Result</div>
+
+    <!-- Prediction Details -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="card bg-base-200 shadow-md rounded-xl p-6">
+            <div class="card-body">
+                <h2 class="card-title text-xl font-semibold">Prediction Status</h2>
+                <p class="text-lg {% if status == 'ok' %}text-success{% else %}text-error{% endif %}">{{ val }}</p>
+            </div>
+        </div>
+        <div class="card bg-base-200 shadow-md rounded-xl p-6">
+            <div class="card-body">
+                <h2 class="card-title text-xl font-semibold">Location Details</h2>
+                <p><span class="font-semibold">City:</span> {{ city_name }}, {{ country }} </p>
+                <p><span class="font-semibold">Soil Type:</span> {{ st }}</p>
+                <p><span class="font-semibold">Distance to River:</span> {{ river|floatformat:3 }} km</p>
+                <p><span class="font-semibold">Elevation:</span> {{ altitude|floatformat:3 }} meters</p>
+                <p><span class="font-semibold">Rainfall:</span> {{ rainfall }} mm</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Weather -->
+    <div class="card bg-base-200 shadow-md rounded-xl mb-8 p-6">
+        <div class="card-body">
+            <h2 class="card-title text-2xl font-bold mb-4">Today's Weather</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Temperature -->
+                <div class="card bg-base-100 shadow-sm rounded-xl p-6 flex items-center justify-center">
+                    <div class="card-body text-center flex flex-col items-center justify-center">
+                        <!-- Dynamic Weather Animation -->
+                        {% if weather_data.data.0.weather.code == 800 %}
+                            <lottie-player
+                                src="../../static/lottie/sunny.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% elif weather_data.data.0.weather.code >= 200 and weather_data.data.0.weather.code <= 232 %}
+                            <lottie-player
+                                src="../../static/lottie/thunderstorm.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% elif weather_data.data.0.weather.code >= 500 and weather_data.data.0.weather.code <= 531 %}
+                            <lottie-player
+                                src="../../static/lottie/rain.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% elif weather_data.data.0.weather.code >= 600 and weather_data.data.0.weather.code <= 622 %}
+                            <lottie-player
+                                src="../../static/lottie/snow.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% elif weather_data.data.0.weather.code >= 701 and weather_data.data.0.weather.code <= 771 %}
+                            <lottie-player
+                                src="../../static/lottie/fog.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% else %}
+                            <lottie-player
+                                src="../../static/lottie/cloudy.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% endif %}
+                        <p class="text-lg font-semibold">Temperature</p>
+                        <p>{{ weather_data.data.0.temp }}°C</p>
+                    </div>
+                </div>
+
+                <!-- Humidity -->
+                <div class="card bg-base-100 shadow-sm rounded-xl p-6 flex items-center justify-center">
+                    <div class="card-body text-center flex flex-col items-center justify-center">
+                        <lottie-player
+                            src="../../static/lottie/humidity.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 100px; height: 100px;"
+                            loop
+                            autoplay
+                        ></lottie-player>
+                        <p class="text-lg font-semibold">Humidity</p>
+                        <p>{{ weather_data.data.0.rh }}%</p>
+                    </div>
+                </div>
+
+                <!-- Wind Speed -->
+                <div class="card bg-base-100 shadow-sm rounded-xl p-6 flex items-center justify-center">
+                    <div class="card-body text-center flex flex-col items-center justify-center">
+                        <lottie-player
+                            src="../../static/lottie/wind.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 100px; height: 100px;"
+                            loop
+                            autoplay
+                        ></lottie-player>
+                        <p class="text-lg font-semibold">Wind Speed</p>
+                        <p>{{ wind_speed_kmh|floatformat:2 }} km/h</p>
+                    </div>
+                </div>
+
+                <!-- Weather Condition -->
+                <div class="card bg-base-100 shadow-sm rounded-xl p-6 flex items-center justify-center">
+                    <div class="card-body text-center flex flex-col items-center justify-center">
+                        <!-- Dynamic Weather Animation -->
+                        {% if weather_data.data.0.weather.code == 800 %}
+                            <lottie-player
+                                src="../../static/lottie/sunny.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% elif weather_data.data.0.weather.code >= 200 and weather_data.data.0.weather.code <= 232 %}
+                            <lottie-player
+                                src="../../static/lottie/thunderstorm.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% elif weather_data.data.0.weather.code >= 500 and weather_data.data.0.weather.code <= 531 %}
+                            <lottie-player
+                                src="../../static/lottie/rain.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% elif weather_data.data.0.weather.code >= 600 and weather_data.data.0.weather.code <= 622 %}
+                            <lottie-player
+                                src="../../static/lottie/snow.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% elif weather_data.data.0.weather.code >= 701 and weather_data.data.0.weather.code <= 771 %}
+                            <lottie-player
+                                src="../../static/lottie/fog.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% else %}
+                            <lottie-player
+                                src="../../static/lottie/cloudy.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 100px; height: 100px;"
+                                loop
+                                autoplay
+                            ></lottie-player>
+                        {% endif %}
+                        <p class="text-lg font-semibold">Condition</p>
+                        <p>{{ weather_data.data.0.weather.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hourly Weather -->
+    <div class="card bg-base-200 shadow-md rounded-xl mb-8 p-6">
+        <div class="card-body">
+            <h2 class="card-title text-2xl font-bold mb-4">Hourly Weather</h2>
+            <div class="carousel rounded-box">
+                {% for hour in hourly_weather_data.data %}
+                <div class="carousel-item">
+                    <div class="card bg-base-100 shadow-sm rounded-xl mx-2 p-6 flex items-center justify-center">
+                        <div class="card-body text-center flex flex-col items-center justify-center">
+                            <!-- Check if the date is today or tomorrow -->
+                            {% if hour.timestamp_local.date == today %}
+                                <!-- Show only the time if the date is today -->
+                                <h3 class="text-xl font-semibold">{{ hour.timestamp_local|date:"g:i A" }}</h3>
+                            {% elif hour.timestamp_local.date == tomorrow %}
+                                <!-- Show "Tomorrow" and the time if the date is tomorrow -->
+                                <h3 class="text-xl font-semibold">Tomorrow, {{ hour.timestamp_local|date:"g:i A" }}</h3>
+                            {% else %}
+                                <!-- Show date and time for any other day -->
+                                <h3 class="text-xl font-semibold">{{ hour.timestamp_local|date:"d-m-Y g:i A" }}</h3>
+                            {% endif %}
+
+                            <!-- Dynamic Animation for Hourly Weather -->
+                            {% if hour.weather.code == 800 %}
+                                <lottie-player
+                                    src="../../static/lottie/sunny.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                    loop
+                                    autoplay
+                                ></lottie-player>
+                            {% elif hour.weather.code >= 200 and hour.weather.code <= 232 %}
+                                <lottie-player
+                                    src="../../static/lottie/thunderstorm.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                    loop
+                                    autoplay
+                                ></lottie-player>
+                            {% elif hour.weather.code >= 500 and hour.weather.code <= 531 %}
+                                <lottie-player
+                                    src="../../static/lottie/rain.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                loop
+                                autoplay
+                                ></lottie-player>
+                            {% elif hour.weather.code >= 600 and hour.weather.code <= 622 %}
+                                <lottie-player
+                                    src="../../static/lottie/snow.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                loop
+                                autoplay
+                                ></lottie-player>
+                            {% elif hour.weather.code >= 701 and hour.weather.code <= 771 %}
+                                <lottie-player
+                                    src="../../static/lottie/fog.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                loop
+                                autoplay
+                                ></lottie-player>
+                            {% else %}
+                                <lottie-player
+                                    src="../../static/lottie/cloudy.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                loop
+                                autoplay
+                                ></lottie-player>
+                            {% endif %}
+                            <p>{{ hour.temp }}°C</p>
+                            <!-- Add Weather Type -->
+                            <p class="text-sm text-gray-600">{{ hour.weather.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Weather -->
+    <div class="card bg-base-200 shadow-md rounded-xl p-6">
+        <div class="card-body">
+            <h2 class="card-title text-2xl font-bold mb-4">Upcoming Weather</h2>
+            <div class="carousel rounded-box">
+                {% for day in forecast_data.data %}
+                <div class="carousel-item">
+                    <div class="card bg-base-100 shadow-sm rounded-xl mx-2 p-6 flex items-center justify-center">
+                        <div class="card-body text-center flex flex-col items-center justify-center">
+                            <!-- Display the date for each forecast -->
+                            <h3 class="text-xl font-semibold mb-2">{{ day.valid_date }}</h3>
+                            <!-- Dynamic Animation for Forecast -->
+                            {% if day.weather.code == 800 %}
+                                <lottie-player
+                                    src="../../static/lottie/sunny.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                loop
+                                autoplay
+                                ></lottie-player>
+                            {% elif day.weather.code >= 200 and day.weather.code <= 232 %}
+                                <lottie-player
+                                    src="../../static/lottie/thunderstorm.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                loop
+                                autoplay
+                                ></lottie-player>
+                            {% elif day.weather.code >= 500 and day.weather.code <= 531 %}
+                                <lottie-player
+                                    src="../../static/lottie/rain.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                loop
+                                autoplay
+                                ></lottie-player>
+                            {% elif day.weather.code >= 600 and day.weather.code <= 622 %}
+                                <lottie-player
+                                    src="../../static/lottie/snow.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                loop
+                                autoplay
+                                ></lottie-player>
+                            {% elif day.weather.code >= 701 and day.weather.code <= 771 %}
+                                <lottie-player
+                                    src="../../static/lottie/fog.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                loop
+                                autoplay
+                                ></lottie-player>
+                            {% else %}
+                                <lottie-player
+                                    src="../../static/lottie/cloudy.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 80px; height: 80px;"
+                                loop
+                                autoplay
+                                ></lottie-player>
+                            {% endif %}
+                            <p class="text-lg font-semibold mt-2">Max Temp</p>
+                            <p>{{ day.max_temp }}°C</p>
+                            <!-- Add Weather Type -->
+                            <p class="text-sm text-gray-600">{{ day.weather.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

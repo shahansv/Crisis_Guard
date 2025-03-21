@@ -1,0 +1,62 @@
+{% extends 'coordinator/dashboard.html' %}
+{% block title %}Manage Stock{% endblock %}
+{% block body %}
+
+<div class="container mx-auto p-4">
+    <div class="flex flex-col items-center mb-4">
+        <h1 class="text-3xl font-bold mb-10">Manage Coordinator</h1>
+    </div>
+
+    <div class="overflow-x-auto w-full">
+        {% for category, products in grouped_quantities.items %}
+        <div class="category-section mb-8">
+            <h2 class="text-2xl font-bold mb-4">{{ category }}</h2>
+            <table class="table w-full">
+                <!-- head -->
+                <thead>
+                    <tr class="bg-base-200">
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- row 1 -->
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div>
+                                    <div class="font-bold">{{ product.product }}</div>
+                                    <div class="text-sm opacity-50">{{ product.category }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ product.total_quantity }}</td>
+                        <td>{{ product.unit }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+        
+        
+        {% if not grouped_quantities %}
+        <div class="bg-yellow-100 text-yellow-700 border border-yellow-300 p-4 rounded-lg flex items-center justify-center w-full">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>No Product found.</span>
+        </div>
+        {% endif %}
+
+        
+        <div class="flex justify-center mt-4">
+            <a href="/coordinator_detailed_stock/" class="btn btn-primary text-white bg-blue-500 hover:bg-blue-700 transition duration-300 ease-in-out px-4 py-2 rounded-md border border-blue-500">View Detailed Stock</a>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

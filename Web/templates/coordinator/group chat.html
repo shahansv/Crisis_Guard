@@ -1,0 +1,145 @@
+{% extends 'coordinator/dashboard.html' %}
+{% block title %}Group Chat{% endblock %}
+{% block body %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="flex-grow flex flex-col bg-base-200 rounded-lg shadow-lg  overflow-hidden h-[calc(100vh-10rem)] max-w-3xl mx-auto">
+    <!-- Header Section -->
+    <div class="flex items-center justify-between p-3 bg-base-300">
+        <div class="flex items-center">
+            <!-- Icon -->
+            <i class="fa-light fa-tents text-2xl ml-2 mr-3"></i>
+            <!-- cname as Heading -->
+            <h1 class="text-lg font-bold">{{ cname }}</h1>
+        </div>
+    </div>
+
+    <!-- Chat Messages Section -->
+    <div class="flex-grow p-4 overflow-y-auto relative" id="send1" style="height: calc(100% - 6rem);">
+        <!-- Messages will be appended here -->
+    </div>
+
+    <!-- Message Input Section -->
+    <div class="p-2 bg-base-300">
+        <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+            <textarea
+                id="textfield"
+                placeholder="Type your message..."
+                class="flex-grow textarea textarea-bordered textarea-sm w-full md:w-auto h-12 resize-none overflow-hidden whitespace-nowrap rounded-lg focus:outline-none"
+                rows="1"
+            ></textarea>
+            <button id="button" class="btn btn-neutral rounded-lg w-full md:w-auto h-12">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#action_menu_btn').click(function () {
+            $('.action_menu').toggle();
+        });
+
+        // Function to scroll the chat scrollbar to the bottom
+        function scrollChatToBottom() {
+            const chatContainer = document.getElementById("send1");
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Fetch messages and scroll to bottom when the chat page is opened
+        test().then(() => {
+            scrollChatToBottom(); // Scroll to bottom after messages are loaded
+        });
+    });
+
+    function test() {
+        return $.ajax({
+            url: "/coun_msg",
+            type: "GET",
+            success: function (dat) {
+                var data = dat["data"];
+                $("#send1").empty();
+                var groupedMessages = {};
+
+                // Group messages by date
+                for (var i = 0; i < data.length; i++) {
+                    var dateLabel = data[i]['date'];
+                    if (!groupedMessages[dateLabel]) {
+                        groupedMessages[dateLabel] = [];
+                    }
+                    groupedMessages[dateLabel].push(data[i]);
+                }
+
+                // Render grouped messages
+                for (var dateLabel in groupedMessages) {
+                    $("#send1").append(`
+                        <div class="sticky top-0 z-10 py-2">
+                            <div class="text-center text-sm text-gray-500 ">
+                                <div class="badge badge-neutral w-24 rounded-xl">${dateLabel}</div>
+                            </div>
+                        </div>
+                    `);
+
+                    groupedMessages[dateLabel].forEach(function (msg) {
+                        var type = msg['from_id'];
+                        var mesg = msg['msg'];
+                        var time = msg['time'];
+                        var photoUrl = msg['photo_url'] || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp";
+                        var senderName = msg['sender_name'];
+
+                        if (type != {{ request.session.lid }}) {
+                            $("#send1").append(`
+                                <div class="chat chat-start">
+                                    <div class="chat-image avatar">
+                                        <div class="w-10 rounded-full">
+                                            <img src="${photoUrl}" alt="User Avatar">
+                                        </div>
+                                    </div>
+                                    <div class="chat-bubble bg-blue-100 text-black rounded-xl relative pb-6">
+                                        <div class="text-sm font-semibold">${senderName}</div>
+                                        <div class="mt-1 pr-10">${mesg}</div>
+                                        <div class="text-xs text-gray-500 absolute bottom-2 right-2">${time}</div>
+                                    </div>
+                                </div>
+                            `);
+                        } else {
+                            $("#send1").append(`
+                                <div class="chat chat-end">
+                                    <div class="chat-image avatar">
+                                        <div class="w-10 rounded-full">
+                                            <img src="${photoUrl}" alt="Your Avatar">
+                                        </div>
+                                    </div>
+                                    <div class="chat-bubble bg-green-100 text-black rounded-xl relative pb-6">
+                                        <div class="text-sm font-semibold">${senderName}</div>
+                                        <div class="mt-1 pr-10">${mesg}</div>
+                                        <div class="text-xs text-gray-500 absolute bottom-2 right-2">${time}</div>
+                                    </div>
+                                </div>
+                            `);
+                        }
+                    });
+                }
+
+                scrollChatToBottom(); // Scroll to bottom after new messages are loaded
+            }
+        });
+    }
+
+    $("#button").click(function () {
+        var msg = $("#textfield").val();
+        if (msg.trim() !== "") {
+            $.ajax({
+                url: "/coun_insert_chat/" + msg,
+                type: "GET",
+                success: function () {
+                    $("#textfield").val("");
+                    test(); // Refresh messages immediately after sending
+                }
+            });
+        }
+    });
+
+    setInterval(test, 1000);
+</script>
+
+{% endblock %}

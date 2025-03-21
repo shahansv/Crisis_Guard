@@ -1,0 +1,179 @@
+{% extends 'admin/dashboard.html' %}
+{% block title %}Manage Camp{% endblock %}
+{% block body %}
+
+<div class="container mx-auto p-4 shadow-lg rounded-lg">
+    <div class="flex flex-col items-center mb-4">
+        <h1 class="text-3xl font-bold mb-10">Manage Camp</h1>
+        <form id="searchForm" action="/admin_search_camp/" method="POST" class="flex items-center w-full max-w-md">
+            <input type="text" name="campname" id="campname" placeholder="Search by Camp Name" class="input input-bordered w-full mr-2 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" />
+            <button type="submit" class="btn btn-neutral rounded-lg">Search</button>
+        </form>
+    </div>
+    <div class="flex flex-wrap items-center justify-center p-4">
+        {% if camp_data %}
+            {% for i in camp_data %}
+            <div class="p-6 m-2 w-full sm:w-56 md:w-64 lg:w-72 xl:w-80 text-center businessdiv rounded-xl shadow-lg transition-colors duration-200 ease-in-out">
+                <!-- Centered Progress Bar and Camp Name -->
+                <div class="mx-auto mb-4">
+                    <div class="radial-progress
+                        {% if i.camp.occupancy_rate <= 50.0 %}
+                            text-green-500
+                        {% elif i.camp.occupancy_rate <= 75.0 %}
+                            text-yellow-500
+                        {% else %}
+                            text-red-500
+                        {% endif %}
+                        " style="--value: {{ i.camp.occupancy_rate|floatformat:1 }};" role="progressbar">
+                        {{ i.camp.occupancy_rate|floatformat:1 }}%
+                    </div>
+                </div>
+                <div class="text-2xl font-bold mb-4">{{ i.camp.camp_name }}</div>
+
+                <!-- Other Camp Details (Not Centered) -->
+                <div class="text-left">
+                    <div class="mt-2"><strong class="text-gray-500">Capacity:</strong> {{ i.camp.capacity }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">Occupancy Rate:</strong> {{ i.camp.member_count }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">District: </strong>{{ i.camp.district }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">City: </strong> {{ i.camp.city }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">Contact No.: </strong> {{ i.camp.contact_no }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">Email: </strong> {{ i.camp.email }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">Created at: </strong> {{ i.camp.created_at }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">Updated at: </strong> {{ i.camp.updated_at }}</div>
+                </div>
+
+                <!-- Coordinator Section -->
+                {% if i.coordinator %}
+                <span class="group relative inline-block">
+                    <!-- Avatar with Coordinator Name -->
+                    <div class="avatar flex items-center space-x-2 bg-green-100 text-green-600 rounded-full py-1 px-3 mt-4">
+                        <div class="mask mask-squircle h-6 w-6">
+                            <img src="{{ i.coordinator.photo.url }}" alt="{{ i.coordinator.name }}" class="w-full h-full object-cover" />
+                        </div>
+                        <span class="text-sm font-medium">{{ i.coordinator.name }}</span>
+                    </div>
+                    
+                    <!-- Hover Popup (ID Card) -->
+                    <div class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block transition-all duration-200 ease-in-out pointer-events-none">
+                        <div class="card w-80 bg-base-100 shadow-md border border-base-300 pointer-events-auto  rounded-2xl shadow-blue-500">
+                            <div class="card-body p-4">
+                                <!-- Centered Photo -->
+                                <div class="flex justify-center">
+                                    <div class="avatar">
+                                        <div class="mask mask-squircle w-24 h-24">
+                                            <img src="{{ i.coordinator.photo.url }}" alt="{{ i.coordinator.name }}" class="w-full h-full object-cover" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-center items-center mt-4">
+                                    <div class="text-center">
+                                        <h2 class="text-lg">{{ i.coordinator.name }}</h2>
+                                        <p class="text-sm text-gray-500">Coordinator</p>
+                                    </div>
+                                </div>
+                                
+                                
+
+
+                                <!-- Divider -->
+                                <div class="divider my-2"></div>
+
+                                <!-- Coordinator Details -->
+                                <div class="space-y-2">
+                                    <!-- Gender and DOB -->
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Gender</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.gender }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">DOB</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.dob }}</span>
+                                    </div>
+
+                                    <!-- District and City -->
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">District</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.district }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">City</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.city }}</span>
+                                    </div>
+
+                                    <!-- PIN and Contact -->
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">PIN</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.pin }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Contact</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.contact_no }}</span>
+                                    </div>
+
+                                    <!-- Email and Aadhaar -->
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Email</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.email }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Aadhaar</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.aadhaar_number }}</span>
+                                    </div>
+
+                                    <!-- Posted At -->
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Posted At</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.posted_at }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+                {% else %}
+                <span class="inline-flex items-center bg-red-100  text-red-600 rounded-full py-1 px-4 text-sm mt-4">
+                    No Coordinator Assigned
+                </span>
+                {% endif %}
+
+                <!-- Edit and Delete Buttons -->
+                <div class="mt-4 flex justify-center space-x-4">
+                    <a href="/admin_edit_camp/{{ i.camp.id }}" class="btn btn-outline btn-neutral transition duration-300 ease-in-out rounded-md border border-gray-500">Edit</a>
+                    <a href="/admin_delete_camp/{{ i.camp.id }}" class="btn btn-outline btn-error text-error transition duration-300 ease-in-out rounded-md border border-error">Delete</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="bg-yellow-100 text-yellow-700 border border-yellow-300 p-4 rounded-lg flex items-center justify-center w-full">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>No Camp found.</span>
+        </div>
+        {% endif %}
+
+        <!-- Add Camp Card -->
+        <div class="w-full flex justify-center">
+            <div class="p-6 m-2 w-full sm:w-56 md:w-64 lg:w-72 xl:w-80 text-center businessdiv rounded-xl shadow-lg transition-colors duration-200 ease-in-out flex items-center justify-center cursor-pointer">
+                <a href="/admin_add_camp/" class="text-6xl text-gray-400 hover:text-gray-600 transition duration-300 ease-in-out">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-12 h-12">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+        const campname = document.getElementById('campname').value.trim();
+        if (campname === '') {
+            event.preventDefault(); // Prevent form submission
+            window.location.href = '/admin_manage_camp/'; // Redirect to the desired page
+        }
+    });
+</script>
+
+{% endblock %}

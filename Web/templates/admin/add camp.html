@@ -1,0 +1,318 @@
+{% extends 'admin/dashboard.html' %}
+{% block title %}Add Camp{% endblock %}
+{% block body %}
+
+<div class="flex items-center justify-center min-h-screen md:mt-8 md:mb-8">
+    <div class="p-8 rounded-lg shadow-lg max-w-xl w-full businessdiv transition-colors duration-400 ease-in-out">
+        <div class="flex justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-16 h-16">
+                <path fill="#58a6ff" d="M466.5 83.7l-192-80a48.2 48.2 0 0 0 -36.9 0l-192 80C27.7 91.1 16 108.6 16 128c0 198.5 114.5 335.7 221.5 380.3 11.8 4.9 25.1 4.9 36.9 0C360.1 472.6 496 349.3 496 128c0-19.4-11.7-36.9-29.5-44.3zM256.1 446.3l-.1-381 175.9 73.3c-3.3 151.4-82.1 261.1-175.8 307.7z"/>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-center mb-6">Add a New Camp</h2>
+        <form id="registrationForm" class="space-y-4" onsubmit="return validateForm()" method="POST" action="/admin_add_camp_post/">
+            <!-- Camp Name -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Camp Name</span>
+                </label>
+                <input id="campName" type="text" placeholder="Enter camp name" class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="camp">
+                <p id="campNameError" class="text-red-500 text-sm mt-1 hidden">Please enter a camp name!</p>
+            </div>
+
+            <!-- Capacity -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Capacity</span>
+                </label>
+                <input id="capacity" type="number" placeholder="Enter capacity" class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="capacity" min="0">
+                <p id="capacityError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid capacity!</p>
+            </div>
+
+            <!-- District Selection -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Select District</span>
+                </label>
+                <select id="district" class="select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" onchange="updateCities()" name="district">
+                    <option disabled selected>Select district</option>
+                    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                    <option value="Kollam">Kollam</option>
+                    <option value="Pathanamthitta">Pathanamthitta</option>
+                    <option value="Alappuzha">Alappuzha</option>
+                    <option value="Kottayam">Kottayam</option>
+                    <option value="Idukki">Idukki</option>
+                    <option value="Ernakulam">Ernakulam</option>
+                    <option value="Thrissur">Thrissur</option>
+                    <option value="Palakkad">Palakkad</option>
+                    <option value="Malappuram">Malappuram</option>
+                    <option value="Kozhikode">Kozhikode</option>
+                    <option value="Wayanad">Wayanad</option>
+                    <option value="Kannur">Kannur</option>
+                    <option value="Kasaragod">Kasaragod</option>
+                </select>
+                <p id="districtError" class="text-red-500 text-sm mt-1 hidden">Please select a district!</p>
+            </div>
+
+            <!-- City Selection -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Select City</span>
+                </label>
+                <select id="city" class="select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" onchange="updatePincode()" name="city">
+                    <option disabled selected>Select city</option>
+                </select>
+                <p id="cityError" class="text-red-500 text-sm mt-1 hidden">Please select a city!</p>
+            </div>
+
+            <!-- Pincode -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Pincode</span>
+                </label>
+                <input id="pincode" type="text" placeholder="Pincode will be auto-generated" class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" readonly name="pin">
+            </div>
+
+            <!-- Contact Number -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Contact Number</span>
+                </label>
+                <input id="contactNumber" type="tel" pattern="\d{10}" placeholder="Enter contact number" class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="contactno" oninput="validateContactNumber()" aria-describedby="contactNumberError" maxlength="10">
+                <p id="contactNumberError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid 10-digit contact number!</p>
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Email</span>
+                </label>
+                <input id="email" type="email" placeholder="Enter email" class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="email">
+                <p id="emailError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid email address!</p>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" class="btn bg-blue-500 text-white hover:bg-blue-700 w-full rounded-lg">Register</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const districtCities = {
+        "Thiruvananthapuram": ["Thiruvananthapuram", "Neyyattinkara", "Nedumangad", "Varkala", "Attingal", "Kattakada"],
+        "Kollam": ["Kollam", "Punalur", "Karunagappally", "Kottarakkara", "Paravur", "Karunagappally"],
+        "Pathanamthitta": ["Pathanamthitta", "Adoor", "Thiruvalla", "Ranni", "Kozhencherry", "Konni"],
+        "Alappuzha": ["Alappuzha", "Cherthala", "Kayamkulam", "Mavelikkara", "Chengannur", "Haripad"],
+        "Kottayam": ["Kottayam", "Changanassery", "Pala", "Vaikom", "Kanjirapally", "Ettumanoor"],
+        "Idukki": ["Painavu", "Thodupuzha", "Adimali", "Nedumkandam", "Munnar", "Devikulam"],
+        "Ernakulam": ["Kochi", "Aluva", "Kothamangalam", "Perumbavoor", "Muvattupuzha", "Kolenchery"],
+        "Thrissur": ["Thrissur", "Chalakudy", "Kodungallur", "Guruvayur", "Irinjalakuda", "Kunnamkulam"],
+        "Palakkad": ["Palakkad", "Ottapalam", "Chittur", "Mannarkkad", "Alathur", "Shornur"],
+        "Malappuram": ["Malappuram", "Manjeri", "Perinthalmanna", "Ponnani", "Tirur", "Nilambur"],
+        "Kozhikode": ["Kozhikode", "Vatakara", "Ramanattukara", "Koyilandy", "Thamarassery", "Payyoli"],
+        "Wayanad": ["Kalpetta", "Mananthavady", "Sulthan Bathery", "Vythiri", "Pulpally", "Meppadi"],
+        "Kannur": ["Kannur", "Thalassery", "Payyannur", "Kuthuparamba", "Mattannur", "Iritty"],
+        "Kasaragod": ["Kasaragod", "Kanhangad", "Nileshwaram", "Manjeshwaram", "Hosdurg", "Kanhangad"]
+    };
+
+    const cityPincodes = {
+        "Thiruvananthapuram": "695001",
+        "Neyyattinkara": "695121",
+        "Nedumangad": "695541",
+        "Varkala": "695141",
+        "Attingal": "695101",
+        "Kattakada": "695573",
+        "Kollam": "691001",
+        "Punalur": "691305",
+        "Karunagappally": "690518",
+        "Kottarakkara": "691506",
+        "Paravur": "691301",
+        "Karunagappally": "690518",
+        "Pathanamthitta": "689645",
+        "Adoor": "691523",
+        "Thiruvalla": "689101",
+        "Ranni": "689673",
+        "Kozhencherry": "689641",
+        "Konni": "689691",
+        "Alappuzha": "688001",
+        "Cherthala": "688524",
+        "Kayamkulam": "690502",
+        "Mavelikkara": "690101",
+        "Chengannur": "689121",
+        "Haripad": "690516",
+        "Kottayam": "686001",
+        "Changanassery": "686101",
+        "Pala": "686575",
+        "Vaikom": "686141",
+        "Kanjirapally": "686507",
+        "Ettumanoor": "686631",
+        "Painavu": "685603",
+        "Thodupuzha": "685584",
+        "Adimali": "685561",
+        "Nedumkandam": "685553",
+        "Munnar": "685612",
+        "Devikulam": "685613",
+        "Kochi": "682001",
+        "Aluva": "683101",
+        "Kothamangalam": "686691",
+        "Perumbavoor": "683542",
+        "Muvattupuzha": "686661",
+        "Kolenchery": "682311",
+        "Thrissur": "680001",
+        "Chalakudy": "680307",
+        "Kodungallur": "680664",
+        "Guruvayur": "680101",
+        "Irinjalakuda": "680125",
+        "Kunnamkulam": "680517",
+        "Palakkad": "678001",
+        "Ottapalam": "679101",
+        "Chittur": "678101",
+        "Mannarkkad": "678582",
+        "Alathur": "678541",
+        "Shornur": "679121",
+        "Malappuram": "676505",
+        "Manjeri": "676121",
+        "Perinthalmanna": "679322",
+        "Ponnani": "679577",
+        "Tirur": "676101",
+        "Nilambur": "679329",
+        "Kozhikode": "673001",
+        "Vatakara": "673101",
+        "Ramanattukara": "673633",
+        "Koyilandy": "673305",
+        "Thamarassery": "673573",
+        "Payyoli": "673627",
+        "Kalpetta": "673121",
+        "Mananthavady": "670645",
+        "Sulthan Bathery": "673592",
+        "Vythiri": "673576",
+        "Pulpally": "673579",
+        "Meppadi": "673577",
+        "Kannur": "670001",
+        "Thalassery": "670101",
+        "Payyannur": "670307",
+        "Kuthuparamba": "670643",
+        "Mattannur": "670702",
+        "Iritty": "670703",
+        "Kasaragod": "671121",
+        "Kanhangad": "671315",
+        "Nileshwaram": "671314",
+        "Manjeshwaram": "671323",
+        "Hosdurg": "671315",
+        "Kanhangad": "671315"
+    };
+
+    function updateCities() {
+        const district = document.getElementById("district").value;
+        const citySelect = document.getElementById("city");
+        citySelect.innerHTML = '<option disabled selected>Select city</option>';
+
+        if (district && districtCities[district]) {
+            districtCities[district].forEach(city => {
+                const option = document.createElement("option");
+                option.value = city;
+                option.textContent = city;
+                citySelect.appendChild(option);
+            });
+        }
+    }
+
+    function updatePincode() {
+        const city = document.getElementById("city").value;
+        const pincodeInput = document.getElementById("pincode");
+
+        if (city && cityPincodes[city]) {
+            pincodeInput.value = cityPincodes[city];
+        } else {
+            pincodeInput.value = "";
+        }
+    }
+
+    function validateForm() {
+        let isValid = true;
+        
+        // Camp Name Validation
+        const campName = document.getElementById("campName").value.trim();
+        const campNameError = document.getElementById("campNameError");
+        const campNamePattern = /^[A-Za-z\s]+$/; 
+        if (!campName) {
+            campNameError.textContent = "Camp name is required.";
+            campNameError.classList.remove("hidden");
+            isValid = false;
+        } else if (!campNamePattern.test(campName)) {
+            campNameError.textContent = "Camp name should contain only letters and spaces.";
+            campNameError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            campNameError.classList.add("hidden");
+        }
+        
+
+        // Capacity Validation
+        const capacity = document.getElementById("capacity").value;
+        const capacityError = document.getElementById("capacityError");
+        if (!capacity || isNaN(capacity) || capacity < 0) {
+            capacityError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            capacityError.classList.add("hidden");
+        }
+
+        // District Validation
+        const district = document.getElementById("district").value;
+        const districtError = document.getElementById("districtError");
+        if (!district || district === "Select district") {
+            districtError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            districtError.classList.add("hidden");
+        }
+
+        // City Validation
+        const city = document.getElementById("city").value;
+        const cityError = document.getElementById("cityError");
+        if (!city || city === "Select city") {
+            cityError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            cityError.classList.add("hidden");
+        }
+
+        // Contact Number Validation
+        const contactNumber = document.getElementById("contactNumber").value;
+        const contactNumberError = document.getElementById("contactNumberError");
+        if (!contactNumber || !/^\d{10}$/.test(contactNumber)) {
+            contactNumberError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            contactNumberError.classList.add("hidden");
+        }
+
+        // Email Validation
+        const email = document.getElementById("email").value;
+        const emailError = document.getElementById("emailError");
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            emailError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            emailError.classList.add("hidden");
+        }
+
+        return isValid;
+    }
+
+    function validateContactNumber() {
+        const contactNumberInput = document.getElementById("contactNumber");
+        const contactNumberError = document.getElementById("contactNumberError");
+        const contactNumber = contactNumberInput.value;
+        contactNumberInput.value = contactNumber.replace(/\D/g, '');
+        if (!contactNumber || !/^\d{10}$/.test(contactNumber)) {
+            contactNumberError.classList.remove("hidden");
+        } else {
+            contactNumberError.classList.add("hidden");
+        }
+    }
+</script>
+{% endblock %}

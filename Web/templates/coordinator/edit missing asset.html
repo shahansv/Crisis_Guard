@@ -1,0 +1,114 @@
+{% extends 'coordinator/dashboard.html' %}
+{% block title %}Edit Missing Asset Registration{% endblock %}
+{% block body %}
+
+<div class="flex items-center justify-center md:mt-5 md:mb-8">
+    <div class="p-8 rounded-lg shadow-lg max-w-xl w-full businessdiv transition-colors duration-400 ease-in-out">
+        <div class="flex justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-16 h-16">
+                <path fill="#58a6ff" d="M466.5 83.7l-192-80a48.2 48.2 0 0 0 -36.9 0l-192 80C27.7 91.1 16 108.6 16 128c0 198.5 114.5 335.7 221.5 380.3 11.8 4.9 25.1 4.9 36.9 0C360.1 472.6 496 349.3 496 128c0-19.4-11.7-36.9-29.5-44.3zM256.1 446.3l-.1-381 175.9 73.3c-3.3 151.4-82.1 261.1-175.8 307.7z"/>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-center mb-6">Edit Missing Asset Registration</h2>
+        <form id="assetForm" class="space-y-4" onsubmit="return validateAssetForm()" method="POST" action="/coordinator_edit_asset_registration_post/">
+            <!-- Category -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Category</span>
+                </label>
+                <select id="category" class="select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="category">
+                    <option value="Vehicles" {% if ob.category == 'Vehicles' %}selected{% endif %}>Vehicles</option>
+                    <option value="Electronics" {% if ob.category == 'Electronics' %}selected{% endif %}>Electronics</option>
+                    <option value="Documents" {% if ob.category == 'Documents' %}selected{% endif %}>Documents</option>
+                    <option value="Tools" {% if ob.category == 'Tools' %}selected{% endif %}>Tools</option>
+                    <option value="Cash" {% if ob.category == 'Cash' %}selected{% endif %}>Cash</option>
+                    <option value="Jewelry" {% if ob.category == 'Jewelry' %}selected{% endif %}>Jewelry</option>
+                    <option value="Other" {% if ob.category == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+                <p id="categoryError" class="text-red-500 text-sm mt-1 hidden">Please select a category!</p>
+            </div>
+
+            <!-- Asset -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Asset</span>
+                </label>
+                <input type="text" class="input input-bordered w-full focus:outline-none rounded-lg" name="asset" value="{{ ob.asset }}">
+                <p id="assetError" class="text-red-500 text-sm mt-1 hidden">Please enter an asset name!</p>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Description</span>
+                </label>
+                <textarea class="textarea textarea-bordered w-full focus:outline-none rounded-lg" name="description" placeholder="Enter description">{{ ob.description }}</textarea>
+                <p id="descriptionError" class="text-red-500 text-sm mt-1 hidden">Please enter a description!</p>
+            </div>
+
+            <!-- Missing Date -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Missing Date</span>
+                </label>
+                <input id="missingDate" type="date" class="input input-bordered w-full focus:outline-none rounded-lg" name="date" value="{{ ob.missing_date|date:'Y-m-d' }}">
+                <p id="missingDateError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid missing date!</p>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" class="btn mt-5 bg-blue-500 text-white hover:bg-blue-700 w-full rounded-lg">Update Asset</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    function validateAssetForm() {
+        let isValid = true;
+
+        // Category Validation
+        const category = document.getElementById("category").value;
+        const categoryError = document.getElementById("categoryError");
+        if (!category) {
+            categoryError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            categoryError.classList.add("hidden");
+        }
+
+        // Asset Validation
+        const asset = document.querySelector("input[name='asset']").value;
+        const assetError = document.getElementById("assetError");
+        if (!asset.trim()) {
+            assetError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            assetError.classList.add("hidden");
+        }
+
+        // Description Validation
+        const description = document.querySelector("textarea[name='description']").value;
+        const descriptionError = document.getElementById("descriptionError");
+        if (!description.trim()) {
+            descriptionError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            descriptionError.classList.add("hidden");
+        }
+
+        // Missing Date Validation
+        const missingDate = document.getElementById("missingDate").value;
+        const missingDateError = document.getElementById("missingDateError");
+        if (!missingDate) {
+            missingDateError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            missingDateError.classList.add("hidden");
+        }
+
+        return isValid;
+    }
+</script>
+{% endblock %}

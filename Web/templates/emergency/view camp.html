@@ -1,0 +1,171 @@
+{% extends 'emergency/dashboard.html' %}
+{% block title %}Camp{% endblock %}
+{% block body %}
+
+<div class="container mx-auto p-4 shadow-lg rounded-lg">
+    <div class="flex flex-col items-center mb-4">
+        <h1 class="text-3xl font-bold mb-10">Camp</h1>
+        <form id="searchForm" action="/ert_search_camp/" method="POST" class="flex items-center w-full max-w-md">
+            <!-- Dropdown for District Selection -->
+            <select name="district" id="district" class="select select-bordered w-full mr-2 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg">
+                <option disabled selected>Select district</option>
+                <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                <option value="Kollam">Kollam</option>
+                <option value="Pathanamthitta">Pathanamthitta</option>
+                <option value="Alappuzha">Alappuzha</option>
+                <option value="Kottayam">Kottayam</option>
+                <option value="Idukki">Idukki</option>
+                <option value="Ernakulam">Ernakulam</option>
+                <option value="Thrissur">Thrissur</option>
+                <option value="Palakkad">Palakkad</option>
+                <option value="Malappuram">Malappuram</option>
+                <option value="Kozhikode">Kozhikode</option>
+                <option value="Wayanad">Wayanad</option>
+                <option value="Kannur">Kannur</option>
+                <option value="Kasaragod">Kasaragod</option>
+            </select>
+            <button type="submit" class="btn btn-primary rounded-lg">Search</button>
+        </form>
+    </div>
+    <div class="flex flex-wrap items-center justify-center p-4">
+        {% if camp_data %}
+            {% for i in camp_data %}
+            <div class="p-6 m-2 w-full sm:w-56 md:w-64 lg:w-72 xl:w-80 text-center businessdiv rounded-xl shadow-lg transition-colors duration-200 ease-in-out">
+                <!-- Centered Progress Bar and Camp Name -->
+                <div class="mx-auto mb-4">
+                    <div class="radial-progress
+                        {% if i.camp.occupancy_rate <= 50.0 %}
+                            text-green-500
+                        {% elif i.camp.occupancy_rate <= 75.0 %}
+                            text-yellow-500
+                        {% else %}
+                            text-red-500
+                        {% endif %}
+                        " style="--value: {{ i.camp.occupancy_rate|floatformat:1 }};" role="progressbar">
+                        {{ i.camp.occupancy_rate|floatformat:1 }}%
+                    </div>
+                </div>
+                <div class="text-2xl font-bold mb-4">{{ i.camp.camp_name }}</div>
+
+                <!-- Other Camp Details (Not Centered) -->
+                <div class="text-left">
+                    <div class="mt-2"><strong class="text-gray-500">Capacity:</strong> {{ i.camp.capacity }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">Occupancy Rate:</strong> {{ i.camp.member_count }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">District: </strong>{{ i.camp.district }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">City: </strong> {{ i.camp.city }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">Contact No.: </strong> {{ i.camp.contact_no }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">Email: </strong> {{ i.camp.email }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">Created at: </strong> {{ i.camp.created_at }}</div>
+                    <div class="mt-2"><strong class="text-gray-500">Updated at: </strong> {{ i.camp.updated_at }}</div>
+                </div>
+
+                <!-- Coordinator Section -->
+                {% if i.coordinator %}
+                <span class="group relative inline-block">
+                    <!-- Avatar with Coordinator Name -->
+                    <div class="avatar flex items-center space-x-2 bg-green-100 text-green-600 rounded-full py-1 px-3 mt-4">
+                        <div class="mask mask-squircle h-6 w-6">
+                            <img src="{{ i.coordinator.photo.url }}" alt="{{ i.coordinator.name }}" class="w-full h-full object-cover" />
+                        </div>
+                        <span class="text-sm font-medium">{{ i.coordinator.name }}</span>
+                    </div>
+                    
+                    <!-- Hover Popup (ID Card) -->
+                    <div class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block transition-all duration-200 ease-in-out pointer-events-none">
+                        <div class="card w-80 bg-base-100 shadow-md border border-base-300 pointer-events-auto  rounded-2xl shadow-blue-500">
+                            <div class="card-body p-4">
+                                <!-- Centered Photo -->
+                                <div class="flex justify-center">
+                                    <div class="avatar">
+                                        <div class="mask mask-squircle w-24 h-24">
+                                            <img src="{{ i.coordinator.photo.url }}" alt="{{ i.coordinator.name }}" class="w-full h-full object-cover" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-center items-center mt-4">
+                                    <div class="text-center">
+                                        <h2 class="text-lg">{{ i.coordinator.name }}</h2>
+                                        <p class="text-sm text-gray-500">Coordinator</p>
+                                    </div>
+                                </div>
+                                
+                                
+
+
+                                <!-- Divider -->
+                                <div class="divider my-2"></div>
+
+                                <!-- Coordinator Details -->
+                                <div class="space-y-2">
+                                    <!-- Gender and DOB -->
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Gender</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.gender }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">DOB</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.dob }}</span>
+                                    </div>
+
+                                    <!-- District and City -->
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">District</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.district }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">City</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.city }}</span>
+                                    </div>
+
+                                    <!-- PIN and Contact -->
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">PIN</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.pin }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Contact</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.contact_no }}</span>
+                                    </div>
+
+                                    <!-- Email and Aadhaar -->
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Email</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.email }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Aadhaar</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.aadhaar_number }}</span>
+                                    </div>
+
+                                    <!-- Posted At -->
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Posted At</span>
+                                        <span class="text-sm font-medium">{{ i.coordinator.posted_at }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+                {% else %}
+                <span class="inline-flex items-center bg-red-100  text-red-600 rounded-full py-1 px-4 text-sm mt-4">
+                    No Coordinator Assigned
+                </span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="bg-yellow-100 text-yellow-700 border border-yellow-300 p-4 rounded-lg flex items-center justify-center w-full">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>No Camp found.</span>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+
+{% endblock %}

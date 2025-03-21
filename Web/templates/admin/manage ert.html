@@ -1,0 +1,177 @@
+{% extends 'admin/dashboard.html' %}
+{% block title %}Manage Emergency Team{% endblock %}
+{% block body %}
+
+<div class="container mx-auto p-4 flex flex-col md:flex-row gap-4 md:gap-8">
+    <!-- Accepted Emergency Team Section -->
+    <div class="flex-1 md:border-r md:border-gray-300 md:pr-4">
+        <div class="flex flex-col items-center mb-4">
+            <h1 class="text-3xl font-bold mb-10">Accepted Emergency Team</h1>
+            <form action="/admin_search_accept_ert/" method="POST" class="flex items-center w-full max-w-md" id="searchFormAccepted">
+                <select class="select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="district" id="districtSelectAccepted">
+                    <option disabled selected value="">Search by District</option>
+                    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                    <option value="Kollam">Kollam</option>
+                    <option value="Pathanamthitta">Pathanamthitta</option>
+                    <option value="Alappuzha">Alappuzha</option>
+                    <option value="Kottayam">Kottayam</option>
+                    <option value="Idukki">Idukki</option>
+                    <option value="Ernakulam">Ernakulam</option>
+                    <option value="Thrissur">Thrissur</option>
+                    <option value="Palakkad">Palakkad</option>
+                    <option value="Malappuram">Malappuram</option>
+                    <option value="Kozhikode">Kozhikode</option>
+                    <option value="Wayanad">Wayanad</option>
+                    <option value="Kannur">Kannur</option>
+                    <option value="Kasaragod">Kasaragod</option>
+                </select>
+                <button type="submit" class="btn btn-neutral rounded-lg m-2">Search</button>
+            </form>
+        </div>
+
+        <div class="overflow-x-auto w-full">
+            <table class="table w-full">
+                <!-- head -->
+                <thead>
+                    <tr class="bg-base-200">
+                        <th>Emergency Team</th>
+                        <th>Contact No</th>
+                        <th>Email</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if val1 %}
+                    {% for i in val1 %}
+                    <tr class="hover">
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div>
+                                    <div class="font-bold">{{ i.department }}</div>
+                                    <div class="text-sm opacity-50"> {{ i.district }} , {{ i.city }} , {{ i.pin }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="hover">{{ i.contact_no }}</td>
+                        <td class="hover">{{ i.email }}</td>
+                        <td class="hover"><a href="/admin_reject_ert/{{ i.LOGIN.id }}"
+                            class="btn btn-outline btn-error text-error transition duration-300 ease-in-out rounded-md border border-error">Reject</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4">
+                            <div class="bg-yellow-100 text-yellow-700 border border-yellow-300 p-4 rounded-lg flex items-center justify-center w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6 mr-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span>No Emergency Team Left to Verify.</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Separator Line for Phone View -->
+    <hr class="my-4 border-gray-300 md:hidden">
+
+    <!-- Rejected Emergency Team Section -->
+    <div class="flex-1 md:pl-4 mt-4 md:mt-0">
+        <div class="flex flex-col items-center mb-4">
+            <h1 class="text-3xl font-bold mb-10">Rejected Emergency Team</h1>
+            <form action="/admin_search_reject_ert/" method="POST" class="flex items-center w-full max-w-md" id="searchFormRejected">
+                <select class="select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="district" id="districtSelectRejected">
+                    <option disabled selected value="">Search by District</option>
+                    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                    <option value="Kollam">Kollam</option>
+                    <option value="Pathanamthitta">Pathanamthitta</option>
+                    <option value="Alappuzha">Alappuzha</option>
+                    <option value="Kottayam">Kottayam</option>
+                    <option value="Idukki">Idukki</option>
+                    <option value="Ernakulam">Ernakulam</option>
+                    <option value="Thrissur">Thrissur</option>
+                    <option value="Palakkad">Palakkad</option>
+                    <option value="Malappuram">Malappuram</option>
+                    <option value="Kozhikode">Kozhikode</option>
+                    <option value="Wayanad">Wayanad</option>
+                    <option value="Kannur">Kannur</option>
+                    <option value="Kasaragod">Kasaragod</option>
+                </select>
+                <button type="submit" class="btn btn-neutral rounded-lg m-2">Search</button>
+            </form>
+        </div>
+
+        <div class="overflow-x-auto w-full">
+            <table class="table w-full">
+                <!-- head -->
+                <thead>
+                    <tr class="bg-base-200">
+                        <th>Emergency Team</th>
+                        <th>Contact No</th>
+                        <th>Email</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- row 1 -->
+                    {% if val2 %}
+                    {% for i in val2 %}
+                    <tr class="hover">
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div>
+                                    <div class="font-bold">{{ i.department }}</div>
+                                    <div class="text-sm opacity-50"> {{ i.district }} , {{ i.city }} , {{ i.pin }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="hover">{{ i.contact_no }}</td>
+                        <td class="hover">{{ i.email }}</td>
+                        <td class="hover"><a href="/admin_accept_ert/{{ i.LOGIN.id }}"
+                            class="btn btn-outline btn-success text-success transition duration-300 ease-in-out rounded-md border border-success">Accept</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4">
+                            <div class="bg-yellow-100 text-yellow-700 border border-yellow-300 p-4 rounded-lg flex items-center justify-center w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6 mr-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span>No Emergency Team Left to Verify.</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchFormAccepted').addEventListener('submit', function(event) {
+        var districtSelect = document.getElementById('districtSelectAccepted');
+        if (districtSelect.value === "") {
+            event.preventDefault(); // Prevent form submission
+            window.location.href = "/admin_manage_ert/"; // Redirect to the specified page
+        }
+    });
+
+    document.getElementById('searchFormRejected').addEventListener('submit', function(event) {
+        var districtSelect = document.getElementById('districtSelectRejected');
+        if (districtSelect.value === "") {
+            event.preventDefault(); // Prevent form submission
+            window.location.href = "/admin_manage_ert/"; // Redirect to the specified page
+        }
+    });
+</script>
+
+{% endblock %}

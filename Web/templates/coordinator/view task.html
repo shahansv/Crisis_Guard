@@ -1,0 +1,154 @@
+{% extends 'coordinator/dashboard.html' %}
+{% block title %}Assign Task to Volunteer{% endblock %}
+{% block body %}
+<div class="flex items-center justify-center pt-0">
+    <div class="p-6 rounded-lg shadow-lg max-w-4xl w-full businessdiv transition-colors duration-400 ease-in-out">
+        <div class="flex justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-16 h-16">
+                <path fill="#58a6ff" d="M466.5 83.7l-192-80a48.2 48.2 0 0 0 -36.9 0l-192 80C27.7 91.1 16 108.6 16 128c0 198.5 114.5 335.7 221.5 380.3 11.8 4.9 25.1 4.9 36.9 0C360.1 472.6 496 349.3 496 128c0-19.4-11.7-36.9-29.5-44.3zM256.1 446.3l-.1-381 175.9 73.3c-3.3 151.4-82.1 261.1-175.8 307.7z"/>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-center mb-4">Assign Task</h2>
+
+        <div class="flex flex-col items-center mt-10">
+            <div class="avatar opacity-100 h-auto transition-all duration-300 ease-in-out">
+                <div class="w-32 rounded">
+                    <img id="photoPreview" src="{{ ob.photo.url }}" alt="Profile Photo" class="w-full h-full object-cover rounded">
+                </div>
+            </div>
+            <div class="mt-2 text-center">
+                <p class="text-xl font-semibold">{{ ob.name }}</p>
+                <p class="text-sm text-gray-500">Volunteer</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto w-full mt-10">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th class="text-center"></th>
+                <th class="text-center">Task</th>
+                <th class="text-center">Date</th>
+                <th class="text-center"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if tasks %}
+                <!-- First, display tasks with status=False -->
+                {% for i in tasks %}
+                  {% if not i.status %}
+                    <tr class="task-row">
+                      <td class="text-center">
+                        <label>
+                          <input type="checkbox" class="task-checkbox appearance-none w-5 h-5 border-2 border-gray-300 rounded-md checked:bg-green-400 checked:border-green-400 hover:checked:bg-green-400 transition-colors duration-200" {% if i.status %}checked{% endif %} disabled />
+                        </label>
+                      </td>
+                      <td class="text-center">{{ i.task }}</td>
+                      <td class="text-center">{{ i.posted_date }}</td>
+                      <td class="text-center">
+                        <a href="/coordinator_delete_task/{{ i.id }}"
+                           class="btn btn-outline btn-error text-error transition duration-300 ease-in-out rounded-md border border-error">
+                            Delete
+                        </a>
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+
+                <!-- Then, display tasks with status=True -->
+                {% for i in tasks %}
+                  {% if i.status %}
+                    <tr class="task-row line-through text-gray-500">
+                      <td class="text-center">
+                        <label>
+                          <input type="checkbox" class="task-checkbox appearance-none w-5 h-5 border-2 border-gray-300 rounded-md checked:bg-green-400 checked:border-green-400 hover:checked:bg-green-400 transition-colors duration-200" {% if i.status %}checked{% endif %} disabled />
+                        </label>
+                      </td>
+                      <td class="text-center">{{ i.task }}</td>
+                      <td class="text-center">{{ i.posted_date }}</td>
+                      <td class="text-center">
+                        <a href="/coordinator_delete_task/{{ i.id }}"
+                        class="btn btn-outline btn-error transition duration-300 ease-in-out rounded-md border opacity-60 pointer-events-none text-gray-400 border-gray-400">
+                            Delete
+                        </a>
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <tr>
+                    <td colspan="9" class="text-center py-4">
+                        <div class="bg-yellow-100 text-yellow-700 border border-yellow-300 p-4 rounded-lg flex items-center justify-center w-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6 mr-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>No Task found.</span>
+                        </div>
+                    </td>
+                </tr>
+              {% endif %}
+              <tr class="cursor-pointer hover:bg-gray-200 transition duration-300 ">
+                <td colspan="10" class="text-center py-4 rounded-lg  text-gray-500 hover:text-gray-950">
+                    <label for="add-task-modal" class="flex items-center justify-center cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Add Task</span>
+                    </label>
+                </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<input type="checkbox" id="add-task-modal" class="modal-toggle" />
+<div class="modal ">
+  <div class="modal-box rounded-lg businessdiv">
+    <h3 class="font-bold text-lg">Add Task</h3>
+    <form id="add-task-form" action="/coordinator_add_task_post/" method="post" class="mt-4">
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Task Description</span>
+        </label>
+        <input type="text" name="task" id="task-input" class="input input-bordered w-full" placeholder="Enter task description" />
+        <p id="task-error" class="text-red-500 text-sm mt-2 hidden">Task description cannot be empty.</p>
+      </div>
+      <div class="modal-action">
+        <button type="submit" class="btn btn-neutral rounded-lg">Submit</button>
+        <label for="add-task-modal" class="btn rounded-lg">Close</label>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("add-task-form");
+    const taskInput = document.getElementById("task-input");
+    const taskError = document.getElementById("task-error");
+
+    form.addEventListener("submit", function (event) {
+      // Check if the task input is empty
+      if (taskInput.value.trim() === "") {
+        event.preventDefault(); // Prevent form submission
+        taskError.classList.remove("hidden"); // Show error message
+        taskInput.classList.add("input-error"); // Add error styling to the input
+      } else {
+        taskError.classList.add("hidden"); // Hide error message
+        taskInput.classList.remove("input-error"); // Remove error styling
+      }
+    });
+
+    // Clear error when the user starts typing
+    taskInput.addEventListener("input", function () {
+      if (taskInput.value.trim() !== "") {
+        taskError.classList.add("hidden");
+        taskInput.classList.remove("input-error");
+      }
+    });
+  });
+</script>
+{% endblock %}

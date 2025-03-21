@@ -1,0 +1,182 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.svg" />
+  <title>{% block title %}Login{% endblock %} - Crisis Guard</title>
+  {% tailwind_css %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+  <!-- Messages/Alerts Section -->
+  <div class="fixed top-4 right-4 z-50 space-y-2">
+    {% for msg in messages %}
+    <div class="alert flex items-center justify-between p-4
+                {% if msg.tags == 'success' %}bg-green-100 text-green-800 border-l-4 border-green-400
+                {% elif msg.tags == 'error' %}bg-red-100 text-red-800 border-l-4 border-red-400{% endif %}
+                rounded-lg shadow-md w-full max-w-xs sm:max-w-sm md:max-w-md" role="alert">
+      <svg class="w-6 h-6 mr-3
+                  {% if msg.tags == 'success' %}text-green-500
+                  {% elif msg.tags == 'error' %}text-red-500{% endif %}"
+           fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        {% if msg.tags == 'error' %}
+        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 7.586l4.293-4.293a1 1 0 111.414 1.414L11.414 9l4.293 4.293a1 1 0 11-1.414 1.414L10 10.414l-4.293 4.293a1 1 0 11-1.414-1.414L8.586 9 4.293 4.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        {% elif msg.tags == 'success' %}
+        <path fill-rule="evenodd" d="M16.707 4.293a1 1 0 00-1.414 0L8 11.586 4.707 8.293a1 1 0 00-1.414 1.414l4 4a 1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" />
+        {% endif %}
+      </svg>
+      <span class="flex-1">{{ msg }}</span>
+      <button class="ml-4
+                     {% if msg.tags == 'success' %}text-green-800 hover:text-green-500
+                     {% elif msg.tags == 'error' %}text-red-800 hover:text-red-500{% endif %}
+                     dismiss-btn" aria-label="Dismiss {{ msg.tags }} message">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M10 9l5-5m0 0l1.5 1.5L11 10l5 5-1.5 1.5-5-5-5 5-1.5-1.5 5-5-5-5L5 4l5 5z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Main Content -->
+  {% block body %}
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-xl shadow-xl p-6">
+      <!-- Logo -->
+      <div class="flex justify-center mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-16 h-16">
+          <path fill="#58a6ff" d="M466.5 83.7l-192-80a48.2 48.2 0 0 0 -36.9 0l-192 80C27.7 91.1 16 108.6 16 128c0 198.5 114.5 335.7 221.5 380.3 11.8 4.9 25.1 4.9 36.9 0C360.1 472.6 496 349.3 496 128c0-19.4-11.7-36.9-29.5-44.3zM256.1 446.3l-.1-381 175.9 73.3c-3.3 151.4-82.1 261.1-175.8 307.7z" />
+        </svg>
+      </div>
+
+      <!-- Heading -->
+      <h1 class="text-2xl font-bold text-center mb-6">Login</h1>
+
+      <!-- Login Form -->
+      <form method="POST" action="/login_post/" class="space-y-4" onsubmit="return validateForm()">
+        <!-- Username Field -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Enter your username"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300" />
+          <span id="username-error" class="text-red-500 text-sm hidden">Username is required.</span>
+        </div>
+
+        <!-- Password Field -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="password">Password</label>
+          <div class="relative">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 pr-10" />
+            <button
+              type="button"
+              id="togglePassword"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center"
+              aria-label="Toggle password visibility">
+              <i class="fas fa-eye text-gray-500"></i>
+            </button>
+          </div>
+          <span id="password-error" class="text-red-500 text-sm hidden">Password is required.</span>
+        </div>
+
+        <!-- Forgot Password Link -->
+        <div class="text-right">
+          <a href="/forgotpass/" class="text-sm text-blue-600 hover:text-blue-500">Forgot Password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300">Login</button>
+      </form>
+
+      <!-- Additional Links -->
+      <div class="mt-6 text-center text-sm">
+        <p>Are you an Emergency Team? <a href="/register_ert/" class="text-blue-600 hover:text-blue-500">Register now</a></p>
+        <p class="mt-2">Already Registered? <a href="/ert_registration_status/" class="text-blue-600 hover:text-blue-500">Check Status</a></p>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+
+  <!-- Scripts -->
+  <script>
+    // Toggle Password Visibility
+    const togglePasswordButton = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = togglePasswordButton?.querySelector('i');
+
+    if (togglePasswordButton && passwordInput && eyeIcon) {
+      togglePasswordButton.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        eyeIcon.classList.toggle('fa-eye');
+        eyeIcon.classList.toggle('fa-eye-slash');
+      });
+    }
+
+    // Dismiss Alerts
+    document.addEventListener('DOMContentLoaded', () => {
+      const dismissButtons = document.querySelectorAll('.dismiss-btn');
+      dismissButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const alert = button.closest('.alert');
+          if (alert) {
+            alert.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+            setTimeout(() => alert.remove(), 500);
+          }
+        });
+      });
+    });
+
+    // Hide Alerts Automatically
+    function hideAlerts() {
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(alert => {
+        setTimeout(() => {
+          alert.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+          setTimeout(() => alert.remove(), 500);
+        }, 3000);
+      });
+    }
+
+    // Initialize Alert Hiding
+    document.addEventListener('DOMContentLoaded', hideAlerts);
+
+    // Form Validation
+    function validateForm() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const usernameError = document.getElementById('username-error');
+      const passwordError = document.getElementById('password-error');
+
+      let isValid = true;
+
+      if (!username) {
+        usernameError.classList.remove('hidden');
+        isValid = false;
+      } else {
+        usernameError.classList.add('hidden');
+      }
+
+      if (!password) {
+        passwordError.classList.remove('hidden');
+        isValid = false;
+      } else {
+        passwordError.classList.add('hidden');
+      }
+
+      return isValid;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+{% extends 'admin/dashboard.html' %}
+{% block title %}Send Notification{% endblock %}
+{% block body %}
+
+<div class="main-content flex-1 p-0 flex items-center justify-center">
+    <div class="p-6 md:p-8 rounded-lg shadow-lg max-w-xl w-full transition-colors duration-400 ease-in-out businessdiv">
+        <div class="flex justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-16 h-16 text-blue-500">
+                <path fill="#58a6ff" d="M466.5 83.7l-192-80a48.2 48.2 0 0 0 -36.9 0l-192 80C27.7 91.1 16 108.6 16 128c0 198.5 114.5 335.7 221.5 380.3 11.8 4.9 25.1 4.9 36.9 0C360.1 472.6 496 349.3 496 128c0-19.4-11.7-36.9-29.5-44.3zM256.1 446.3l-.1-381 175.9 73.3c-3.3 151.4-82.1 261.1-175.8 307.7z"/>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-center mb-6">Send Notification</h2>
+        <form id="notificationForm" class="space-y-4" onsubmit="return validateForm()" method="POST" action="/admin_send_notification_post/" enctype="multipart/form-data">
+            <!-- Title -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Title</span>
+                </label>
+                <input id="title" type="text" class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="title" placeholder="Enter title">
+                <p id="titleError" class="text-red-500 text-sm mt-1 hidden">Please enter a title!</p>
+            </div>
+
+            <!-- Notification -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Notification</span>
+                </label>
+                <textarea id="notification" class="textarea textarea-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="notification" placeholder="Enter notification"></textarea>
+                <p id="notificationError" class="text-red-500 text-sm mt-1 hidden">Please enter a notification!</p>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" class="btn bg-blue-500 text-white hover:bg-blue-700 w-full rounded-lg">Send</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function validateForm() {
+        let isValid = true;
+
+        // Title Validation
+        const title = document.getElementById("title").value;
+        const titleError = document.getElementById("titleError");
+        if (!title) {
+            titleError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            titleError.classList.add("hidden");
+        }
+
+        // Notification Validation
+        const notification = document.getElementById("notification").value;
+        const notificationError = document.getElementById("notificationError");
+        if (!notification) {
+            notificationError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            notificationError.classList.add("hidden");
+        }
+
+        return isValid;
+    }
+</script>
+{% endblock %}

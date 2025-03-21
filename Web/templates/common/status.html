@@ -1,0 +1,60 @@
+{% extends 'common/login.html' %}
+
+{% block title %}Registration Status - Crisis Guard{% endblock %}
+
+{% block body %}
+<div class="container mx-auto mt-5 p-4 rounded-xl shadow-xl" id="business-container">
+    <h1 class="text-3xl font-bold mb-10 text-center">Registration Status</h1>
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr class="bg-base-200">
+                    <th class="px-4 py-2">Sno</th>
+                    <th class="px-4 py-2">Department</th>
+                    <th class="px-4 py-2">District</th>
+                    <th class="px-4 py-2">City</th>
+                    <th class="px-4 py-2">Pincode</th>
+                    <th class="px-4 py-2">Contact No</th>
+                    <th class="px-4 py-2">Email</th>
+                    <th class="px-4 py-2 ">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if val %}
+                    {% for i in val %}
+                    <tr class="hover">
+                        <td class="px-4 py-2">{{ forloop.counter }}</td>
+                        <td class="px-4 py-2">{{ i.department }}</td>
+                        <td class="px-4 py-2">{{ i.district }}</td>
+                        <td class="px-4 py-2">{{ i.city }}</td>
+                        <td class="px-4 py-2">{{ i.pin }}</td>
+                        <td class="px-4 py-2">{{ i.contact_no }}</td>
+                        <td class="px-4 py-2">{{ i.email }}</td>
+                        <td class="px-4 py-2 ">
+                            <span class="badge text-xs md:text-sm rounded-lg
+                                {% if i.LOGIN.type == 'ERT' %} badge-success text-white
+                                {% elif i.LOGIN.type == 'Rejected' %} badge-error text-white
+                                {% else %} badge-warning {% endif %}">
+                                {{ i.LOGIN.type }}
+                            </span>
+                        </td>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">No data available</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }} 
+<script>
+  console.log('Child page script loaded!');  
+</script>
+{% endblock %}

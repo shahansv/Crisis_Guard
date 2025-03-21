@@ -1,0 +1,276 @@
+{% extends 'coordinator/dashboard.html' %}
+{% block title %}Add Stock{% endblock %}
+{% block body %}
+
+<div class="flex items-center justify-center md:mt-5 md:mb-8">
+    <div class="p-8 rounded-lg shadow-lg max-w-xl w-full businessdiv transition-colors duration-400 ease-in-out">
+        <div class="flex justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-16 h-16">
+                <path fill="#58a6ff" d="M466.5 83.7l-192-80a48.2 48.2 0 0 0 -36.9 0l-192 80C27.7 91.1 16 108.6 16 128c0 198.5 114.5 335.7 221.5 380.3 11.8 4.9 25.1 4.9 36.9 0C360.1 472.6 496 349.3 496 128c0-19.4-11.7-36.9-29.5-44.3zM256.1 446.3l-.1-381 175.9 73.3c-3.3 151.4-82.1 261.1-175.8 307.7z"/>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-center mb-6">Add Camp Stock</h2>
+        <form id="stockForm" class="space-y-4" onsubmit="return validateStockForm()" method="POST" action="/coordinator_add_stock_post/">
+            <!-- Category of Product -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Category of Product</span>
+                </label>
+                <select id="category" class="select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="category" onchange="updateProductTypes()">
+                    <option disabled selected>Select category</option>
+                    <option value="Food">Food</option>
+                    <option value="Medical Supplies">Medical Supplies</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Water">Water</option>
+                    <option value="Shelter Materials">Shelter Materials</option>
+                    <option value="Hygiene Kits">Hygiene Kits</option>
+                    <option value="Tools">Tools</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Fuel">Fuel</option>
+                    <option value="Communication Equipment">Communication Equipment</option>
+                    <option value="Other">Other</option>
+                </select>
+                <p id="categoryError" class="text-red-500 text-sm mt-1 hidden">Please select a category!</p>
+            </div>
+
+            <!-- Custom Category and Type Inputs -->
+            <div id="customCategoryDiv" class="hidden">
+                <label class="label">
+                    <span class="label-text">Custom Category</span>
+                </label>
+                <input id="customCategory" type="text" placeholder="Enter custom category" class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg">
+                <p id="customCategoryError" class="text-red-500 text-sm mt-1 hidden">Please enter a custom category!</p>
+            </div>
+
+            <!-- Type of Product -->
+            <div id="productTypeDiv">
+                <label class="label">
+                    <span class="label-text">Type of Product</span>
+                </label>
+                <select id="productType" class="select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="product" onchange="handleProductTypeChange()">
+                    <option disabled selected>Select type</option>
+                </select>
+                <p id="productTypeError" class="text-red-500 text-sm mt-1 hidden">Please select a type!</p>
+            </div>
+
+            <div id="customTypeDiv" class="hidden">
+                <label class="label">
+                    <span class="label-text">Custom Type</span>
+                </label>
+                <input id="customType" type="text" placeholder="Enter custom type" class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg">
+                <p id="customTypeError" class="text-red-500 text-sm mt-1 hidden">Please enter a custom type!</p>
+            </div>
+
+            <!-- Name of Product -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Name of Product</span>
+                </label>
+                <input id="productName" type="text" placeholder="Enter product name" class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg" name="name">
+                <p id="productNameError" class="text-red-500 text-sm mt-1 hidden">Please enter a product name!</p>
+            </div>
+
+            <!-- Quantity and Unit -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Quantity</span>
+                </label>
+                <div class="flex">
+                    <input id="quantity" type="number" placeholder="Enter quantity" class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-l-lg" name="quantity">
+                    <select id="productUnit" class="select select-bordered focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-r-lg" name="unit">
+                        <option disabled selected>Select unit</option>
+                    </select>
+                </div>
+                <p id="quantityError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid quantity!</p>
+                <p id="productUnitError" class="text-red-500 text-sm mt-1 hidden">Please select a unit!</p>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" class="btn bg-blue-500 text-white hover:bg-blue-700 w-full rounded-lg">Add Stock</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const categoryProductTypes = {
+        "Food": ["Vegetables", "Fruits", "Grains", "Dairy", "Meat", "Masala", "Other"],
+        "Medical Supplies": ["Bandages", "Medicines", "Syringes", "Gloves", "Masks", "Other"],
+        "Clothing": ["Shirts", "Pants", "Jackets", "Shoes", "Socks", "Other"],
+        "Water": ["Bottled Water", "Water Purifiers", "Water Filters", "Other"],
+        "Shelter Materials": ["Tents", "Tarps", "Blankets", "Mattresses", "Sleeping Bags", "Other"],
+        "Hygiene Kits": ["Soap", "Toothpaste", "Sanitary Pads", "Shampoo", "Toilet Paper", "Other"],
+        "Tools": ["Shovels", "Hammers", "Saws", "Axes", "Pliers", "Other"],
+        "Electronics": ["Flashlights", "Batteries", "Radios", "Chargers", "Lanterns", "Other"],
+        "Fuel": ["Gasoline", "Diesel", "Kerosene", "Propane", "Charcoal", "Other"],
+        "Communication Equipment": ["Walkie-Talkies", "Satellite Phones", "Radios", "Antennas", "Batteries", "Other"]
+    };
+
+    const productUnits = {
+        "Food": ["Kg", "Liter", "Piece", "Packet"],
+        "Medical Supplies": ["Piece", "Box", "Bottle"],
+        "Clothing": ["Piece", "Pair"],
+        "Water": ["Liter", "Bottle"],
+        "Shelter Materials": ["Piece", "Set"],
+        "Hygiene Kits": ["Piece", "Box"],
+        "Tools": ["Piece", "Set"],
+        "Electronics": ["Piece", "Set"],
+        "Fuel": ["Liter", "Gallon"],
+        "Communication Equipment": ["Piece", "Set"],
+        "Other": ["Piece", "Box", "Liter", "Kg"]
+    };
+
+    function updateProductTypes() {
+        const category = document.getElementById("category").value;
+        const productTypeSelect = document.getElementById("productType");
+        const productTypeDiv = document.getElementById("productTypeDiv");
+        const customCategoryDiv = document.getElementById("customCategoryDiv");
+        const customTypeDiv = document.getElementById("customTypeDiv");
+        const productUnitSelect = document.getElementById("productUnit");
+        const customCategoryInput = document.getElementById("customCategory");
+        const customTypeInput = document.getElementById("customType");
+
+        productTypeSelect.innerHTML = '<option disabled selected>Select type</option>';
+        customCategoryDiv.classList.add("hidden");
+        customTypeDiv.classList.add("hidden");
+
+        if (category && categoryProductTypes[category]) {
+            categoryProductTypes[category].forEach(type => {
+                const option = document.createElement("option");
+                option.value = type;
+                option.textContent = type;
+                productTypeSelect.appendChild(option);
+            });
+            productTypeDiv.classList.remove("hidden");
+            customCategoryInput.removeAttribute("name");
+            customTypeInput.removeAttribute("name");
+        } else if (category === "Other") {
+            customCategoryDiv.classList.remove("hidden");
+            customTypeDiv.classList.remove("hidden");
+            productTypeDiv.classList.add("hidden");
+            customCategoryInput.setAttribute("name", "category");
+            customTypeInput.setAttribute("name", "product");
+        } else {
+            productTypeDiv.classList.add("hidden");
+            customCategoryInput.removeAttribute("name");
+            customTypeInput.removeAttribute("name");
+        }
+
+        updateProductUnits(category);
+    }
+
+    function handleProductTypeChange() {
+        const productType = document.getElementById("productType").value;
+        const customTypeDiv = document.getElementById("customTypeDiv");
+        const customTypeInput = document.getElementById("customType");
+
+        if (productType === "Other") {
+            customTypeDiv.classList.remove("hidden");
+            customTypeInput.setAttribute("name", "product");
+        } else {
+            customTypeDiv.classList.add("hidden");
+            customTypeInput.removeAttribute("name");
+        }
+    }
+
+    function updateProductUnits(category) {
+        const productUnitSelect = document.getElementById("productUnit");
+        productUnitSelect.innerHTML = '<option disabled selected>Select unit</option>';
+
+        if (category && productUnits[category]) {
+            productUnits[category].forEach(unit => {
+                const option = document.createElement("option");
+                option.value = unit;
+                option.textContent = unit;
+                productUnitSelect.appendChild(option);
+            });
+        }
+    }
+
+    function validateStockForm() {
+        let isValid = true;
+
+        // Category Validation
+        const category = document.getElementById("category").value;
+        const categoryError = document.getElementById("categoryError");
+        if (!category || category === "Select category") {
+            categoryError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            categoryError.classList.add("hidden");
+        }
+
+        // Custom Category Validation
+        const customCategoryDiv = document.getElementById("customCategoryDiv");
+        if (!customCategoryDiv.classList.contains("hidden")) {
+            const customCategory = document.getElementById("customCategory").value;
+            const customCategoryError = document.getElementById("customCategoryError");
+            if (!customCategory) {
+                customCategoryError.classList.remove("hidden");
+                isValid = false;
+            } else {
+                customCategoryError.classList.add("hidden");
+            }
+        }
+
+        // Product Type Validation
+        const productTypeDiv = document.getElementById("productTypeDiv");
+        if (!productTypeDiv.classList.contains("hidden")) {
+            const productType = document.getElementById("productType").value;
+            const productTypeError = document.getElementById("productTypeError");
+            if (!productType || productType === "Select type") {
+                productTypeError.classList.remove("hidden");
+                isValid = false;
+            } else {
+                productTypeError.classList.add("hidden");
+            }
+        }
+
+        // Custom Type Validation
+        const customTypeDiv = document.getElementById("customTypeDiv");
+        if (!customTypeDiv.classList.contains("hidden")) {
+            const customType = document.getElementById("customType").value;
+            const customTypeError = document.getElementById("customTypeError");
+            if (!customType) {
+                customTypeError.classList.remove("hidden");
+                isValid = false;
+            } else {
+                customTypeError.classList.add("hidden");
+            }
+        }
+
+        // Product Unit Validation
+        const productUnit = document.getElementById("productUnit").value;
+        const productUnitError = document.getElementById("productUnitError");
+        if (!productUnit || productUnit === "Select unit") {
+            productUnitError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            productUnitError.classList.add("hidden");
+        }
+
+        // Product Name Validation
+        const productName = document.getElementById("productName").value;
+        const productNameError = document.getElementById("productNameError");
+        if (!productName) {
+            productNameError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            productNameError.classList.add("hidden");
+        }
+
+        // Quantity Validation
+        const quantity = document.getElementById("quantity").value;
+        const quantityError = document.getElementById("quantityError");
+        if (!quantity || isNaN(quantity) || quantity <= 0) {
+            quantityError.classList.remove("hidden");
+            isValid = false;
+        } else {
+            quantityError.classList.add("hidden");
+        }
+
+        return isValid;
+    }
+</script>
+{% endblock %}
